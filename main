@@ -47,7 +47,7 @@ type datajson struct
 //type MLresult [] mlr
 
 func MLrestaurant(text string)(jsonAnswer MLresult){
-	var words[] string
+		var words[] string
 	var training[] Data
 	var aux[] string
 
@@ -73,9 +73,19 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	
 	training = append(training,Data{"quiero ordenar pizza","orderpizza"})
 	training = append(training,Data{"por favor quiero una pizza","orderpizza"})
-	training = append(training,Data{"pizza por favor ","orderpizza"})
+	training = append(training,Data{"pizza por favor","orderpizza"})
 	
+	training = append(training,Data{"quiero ordenar hamburguesa","orderHamburguesa"})
+	training = append(training,Data{"por favor quiero una hamburguesa","orderHamburguesa"})
+	training = append(training,Data{"hamburguesa por favor","orderHamburguesa"})
 	
+	training = append(training,Data{"quiero ordenar ensalada","ordersalad"})
+	training = append(training,Data{"por favor quiero una ensalada","ordersalad"})
+	training = append(training,Data{"ensalada por favor ","ordersalad"})
+	
+	training = append(training,Data{"quiero ordenar gaseosa","ordersoda"})
+	training = append(training,Data{"por favor quiero una gaseosa","ordersoda"})
+	training = append(training,Data{"gaseosa por favor","ordersoda"})
 
 	//#quiero ordenar pizza (food,order,pizza)  #por favor quiero una pizza (food,order,pizza)  #pizza por favor (food,order,pizza)  #quiero ordenar hamburguesa (food,order,hamburger)  #por favor quiero una hamburguesa (food,order,hamburger)  #hamburguesa por favor (food,order,hamburger)  #quiero ordenar ensalada (food,order,salad)  #por favor quiero una ensalada (food,order,salad)  #ensalada por favor (food,order,salad)  #quiero ordenar gaseosa (food,order,soda)  #por favor quiero una gaseosa (food,order,soda)  #gaseosa por favor (food,order,soda)
 	//words := strings.Split(training[0].sentence," ")	
@@ -94,9 +104,9 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	words = removeDuplicateElement(words)
 	tamano = len(words)
 	fmt.Println(tamano)
-	var bagtraining[18][33] float64	
+	var bagtraining[27][36] float64	
 	//fmt.Println(bagtraining)
-
+	
 	for x:=0 ; x < len(training); x++{
 		aux =  strings.Split(training[x].sentence," ")
 		for i:=0 ; i < len(words) ; i++{		
@@ -116,10 +126,13 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	//fmt.Println(words)
 	//fmt.Println(bagtraining)
 	
-	targets := []float64{1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0}  // greeting
-	targets2:= []float64{0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0}  // liked
-	targets3:= []float64{0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0}  // disliked
-	targets4:= []float64{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1}  // order
+	targets := []float64{1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}  // greeting
+	targets2:= []float64{0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}  // liked
+	targets3:= []float64{0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0}  // disliked
+	targets4:= []float64{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0}  // orderpizza
+	targets5:= []float64{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0}  // orderhamburguesa
+	targets6:= []float64{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0} //ordersalad
+	targets7:= []float64{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1} //ordersoda
 	//fmt.Println(targets)
 	var bagtrainingarr [] float64
 	
@@ -131,22 +144,30 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	
 	//fmt.Println(bagtrainingarr)
 	
-	a := mat.NewDense(18, 33,bagtrainingarr )
+	a := mat.NewDense(27, 36,bagtrainingarr )
 	//fa := mat.Formatted(a, mat.Prefix("    "), mat.Squeeze()) //matriz fa donde estan todos los datos de entrenamiento
 	//fmt.Printf("with all values:\na = %v\n\n", fa)
 	
-	b := mat.NewDense(18, 1,targets )
-	b2:= mat.NewDense(18, 1,targets2 )
-	b3:= mat.NewDense(18, 1,targets3 )
-	b4:= mat.NewDense(18, 1,targets4 )
+	b := mat.NewDense(27, 1,targets )
+	b2:= mat.NewDense(27, 1,targets2 )
+	b3:= mat.NewDense(27, 1,targets3 )
+	b4:= mat.NewDense(27, 1,targets4 )
+	b5:= mat.NewDense(27, 1,targets5 )
+	b6:= mat.NewDense(27, 1,targets6 )
+	b7:= mat.NewDense(27, 1,targets7 )
+	
 	//fb := mat.Formatted(b, mat.Prefix("    "), mat.Squeeze()) //matriz fa donde estan todos los target del entrenamiento
 	//fmt.Printf("with all values:\nb = %v\n\n", fb)
+	//fmt.Println("llegue aca")
+	weight :=[]float64{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5}
+	c := mat.NewDense(36, 1,weight )
+	ac:= mat.NewDense(36, 1,weight )
+	c3:= mat.NewDense(36, 1,weight )
+	c4:= mat.NewDense(36, 1,weight )
+	c5:= mat.NewDense(36, 1,weight )
+	c6:= mat.NewDense(36, 1,weight )
+	c7:= mat.NewDense(36, 1,weight )
 	
-	weight :=[]float64{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5}
-	c := mat.NewDense(33, 1,weight )
-	ac:= mat.NewDense(33, 1,weight )
-	c3:= mat.NewDense(33, 1,weight )
-	c4:= mat.NewDense(33, 1,weight )
 	//fc := mat.Formatted(c, mat.Prefix("    "), mat.Squeeze()) //matriz de pesos
 	//fmt.Printf("with all values:\nc = %v\n\n", fc)
 	var y int
@@ -157,14 +178,23 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	_, l2 := ac.Dims()
 	_, l3 := c3.Dims()
 	_, l4 := c4.Dims()
+	_, l5 := c5.Dims()
+	_, l6 := c6.Dims()
+	_, l7 := c7.Dims()
 	o := mat.NewDense(r, l, nil)
 	o2:= mat.NewDense(r, l2, nil)
 	o3:= mat.NewDense(r, l3, nil)
 	o4:= mat.NewDense(r, l4, nil)
+	o5:= mat.NewDense(r, l5, nil)
+	o6:= mat.NewDense(r, l6, nil)
+	o7:= mat.NewDense(r, l7, nil)
 	o.Product(a, c)
 	o2.Product(a, ac)
 	o3.Product(a, c3)
 	o4.Product(a,c4)
+	o5.Product(a,c5)
+	o6.Product(a,c6)
+	o7.Product(a,c7)
 	//fo := mat.Formatted(o, mat.Prefix("    "), mat.Squeeze()) //matriz de pesos	
 	//fmt.Printf("with all values:\no = %v\n\n", o)  // matriz resultante de multiplicar el training data por los pesos se lleamara (tporp)
 	
@@ -172,41 +202,65 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	var actiportporp2 [] float64
 	var actiportporp3 [] float64
 	var actiportporp4 [] float64
+	var actiportporp5 [] float64
+	var actiportporp6 [] float64
+	var actiportporp7 [] float64
 	var z float64	
 	var z2 float64
 	var z3 float64
 	var z4 float64
+	var z5 float64
+	var z6 float64
+	var z7 float64
 	for x:=0 ; x < r; x++{	
 		z = o.At(x,0)
 		z2= o2.At(x,0)
 		z3= o3.At(x,0)
 		z4= o4.At(x,0)
+		z5= o5.At(x,0)
+		z6= o6.At(x,0)
+		z7= o7.At(x,0)
 		z=1.0 / (1 + math.Exp(-1*z))
 		z2=1.0 / (1 + math.Exp(-1*z2))
 		z3=1.0 / (1 + math.Exp(-1*z3))
 		z4=1.0 / (1 + math.Exp(-1*z4))
+		z5=1.0 / (1 + math.Exp(-1*z5))
+		z6=1.0 / (1 + math.Exp(-1*z6))
+		z7=1.0 / (1 + math.Exp(-1*z7))
 		actiportporp = append(actiportporp,z)
 		actiportporp2 = append(actiportporp2,z2)
 		actiportporp3 = append(actiportporp3,z3)
 		actiportporp4 = append(actiportporp4,z4)
+		actiportporp5 = append(actiportporp5,z5)
+		actiportporp6 = append(actiportporp6,z6)
+		actiportporp7 = append(actiportporp7,z7)
 		//fmt.Printf("with all values:\nz = %v\n\n", z)
 	}
 
 	//fmt.Printf("with all values:\nactiportporp = %v\n\n",actiportporp )
-	app:=mat.NewDense(18,1,actiportporp)
-	app2:=mat.NewDense(18,1,actiportporp2)		
-	app3:=mat.NewDense(18,1,actiportporp3)
-	app4:=mat.NewDense(18,1,actiportporp4)
+	app:=mat.NewDense(27,1,actiportporp)
+	app2:=mat.NewDense(27,1,actiportporp2)		
+	app3:=mat.NewDense(27,1,actiportporp3)
+	app4:=mat.NewDense(27,1,actiportporp4)
+	app5:=mat.NewDense(27,1,actiportporp5)
+	app6:=mat.NewDense(27,1,actiportporp6)
+	app7:=mat.NewDense(27,1,actiportporp7)
 	
-	error := mat.NewDense(18, 1, nil)
-	error2 := mat.NewDense(18, 1, nil)
-	error3 := mat.NewDense(18, 1, nil)
-	error4 := mat.NewDense(18, 1, nil)
+	error := mat.NewDense(27, 1, nil)
+	error2 := mat.NewDense(27, 1, nil)
+	error3 := mat.NewDense(27, 1, nil)
+	error4 := mat.NewDense(27, 1, nil)
+	error5 := mat.NewDense(27, 1, nil)
+	error6 := mat.NewDense(27, 1, nil)
+	error7 := mat.NewDense(27, 1, nil)
 	
 	error.Sub(b,app)
 	error2.Sub(b2,app2)
 	error3.Sub(b3,app3)
 	error4.Sub(b4,app4)
+	error5.Sub(b5,app5)
+	error6.Sub(b6,app6)
+	error7.Sub(b7,app7)
 
 	//fmt.Printf("with all values:\nerror = %v\n\n",error )
 	//fmt.Printf("with all values:\nerror2 = %v\n\n",error2 )
@@ -215,7 +269,10 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	var derivative2 [] float64
 	var derivative3 [] float64
 	var derivative4 [] float64
-	for x:=0 ; x < 18; x++{	
+	var derivative5 [] float64
+	var derivative6 [] float64
+	var derivative7 [] float64
+	for x:=0 ; x < 27; x++{	
 		z = app.At(x,0)
 		z = z * (1 - z)
 		derivative = append(derivative,z)
@@ -228,19 +285,34 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 		z4 = app4.At(x,0)
 		z4 = z4 * (1 - z4)		
 		derivative4 = append(derivative4,z4)
+		z5 = app5.At(x,0)
+		z5 = z5 * (1 - z5)		
+		derivative5 = append(derivative5,z5)
+		z6 = app6.At(x,0)
+		z6 = z6 * (1 - z6)		
+		derivative6 = append(derivative6,z6)
+		z7 = app7.At(x,0)
+		z7 = z7 * (1 - z7)		
+		derivative7 = append(derivative7,z7)
 		//fmt.Printf("with all values:\nz = %v\n\n", z)
 	}
 	
 	//fmt.Printf("with all values:\nderivative = %v\n\n",derivative )
-	derivativemat:= mat.NewDense(18,1,derivative)
-	derivativemat2:= mat.NewDense(18,1,derivative2)
-	derivativemat3:= mat.NewDense(18,1,derivative3)
-	derivativemat4:= mat.NewDense(18,1,derivative4)
+	derivativemat:= mat.NewDense(27,1,derivative)
+	derivativemat2:= mat.NewDense(27,1,derivative2)
+	derivativemat3:= mat.NewDense(27,1,derivative3)
+	derivativemat4:= mat.NewDense(27,1,derivative4)
+	derivativemat5:= mat.NewDense(27,1,derivative5)
+	derivativemat6:= mat.NewDense(27,1,derivative6)
+	derivativemat7:= mat.NewDense(27,1,derivative7)
 	var delta [] float64
 	var delta2 [] float64
 	var delta3 [] float64
 	var delta4 [] float64
-	for x:=0 ; x < 18; x++{	
+	var delta5 [] float64
+	var delta6 [] float64
+	var delta7 [] float64
+	for x:=0 ; x < 27; x++{	
 		z = derivativemat.At(x,0)* error.At(x,0)
 		delta = append(delta,z)
 		z2 = derivativemat2.At(x,0)* error2.At(x,0)
@@ -249,16 +321,25 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 		delta3 = append(delta3,z3)
 		z4 = derivativemat4.At(x,0)* error4.At(x,0)
 		delta4 = append(delta4,z4)
+		z5 = derivativemat5.At(x,0)* error5.At(x,0)
+		delta5 = append(delta5,z5)
+		z6 = derivativemat6.At(x,0)* error6.At(x,0)
+		delta6 = append(delta6,z6)
+		z7 = derivativemat7.At(x,0)* error7.At(x,0)
+		delta7 = append(delta7,z7)
 		//fmt.Printf("with all values:\nz = %v\n\n", z)
 	}
 	//fmt.Printf("with all values:\ndelta = %v\n\n",delta )
 	//fmt.Printf("with all values:\ndelta2 = %v\n\n",delta2 )
 	//fmt.Printf("with all values:\ndelta3 = %v\n\n",delta3 )
 	
-	deltam:= mat.NewDense(18,1,delta)
-	deltam2:= mat.NewDense(18,1,delta2)
-	deltam3:= mat.NewDense(18,1,delta3)
-	deltam4:= mat.NewDense(18,1,delta4)
+	deltam:= mat.NewDense(27,1,delta)
+	deltam2:= mat.NewDense(27,1,delta2)
+	deltam3:= mat.NewDense(27,1,delta3)
+	deltam4:= mat.NewDense(27,1,delta4)
+	deltam5:= mat.NewDense(27,1,delta5)
+	deltam6:= mat.NewDense(27,1,delta6)
+	deltam7:= mat.NewDense(27,1,delta7)
 	//fmt.Printf("with all values:\ndelta = %v\n\n", deltam)
 	//fmt.Printf("with all values:\ndelta2 = %v\n\n", deltam2)
 	//fmt.Printf("with all values:\ndelta3 = %v\n\n", deltam3)
@@ -271,23 +352,35 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	_, k2 := deltam2.Dims()
 	_, k3 := deltam3.Dims()
 	_, k4 := deltam4.Dims()
+	_, k5 := deltam5.Dims()
+	_, k6 := deltam6.Dims()
+	_, k7 := deltam7.Dims()
 	atpordelta := mat.NewDense(s, k, nil)
 	atpordeltab := mat.NewDense(s, k2, nil)
 	atpordeltac := mat.NewDense(s, k3, nil)
 	atpordeltad := mat.NewDense(s,k4,nil)
+	atpordeltae := mat.NewDense(s,k5,nil)
+	atpordeltaf := mat.NewDense(s,k6,nil)
+	atpordeltag := mat.NewDense(s,k7,nil)
 	atpordelta.Product(aT, deltam)
 	atpordeltab.Product(aT, deltam2)
 	atpordeltac.Product(aT, deltam3)
 	atpordeltad.Product(aT,deltam4)
+	atpordeltae.Product(aT,deltam5)
+	atpordeltaf.Product(aT,deltam6)
+	atpordeltag.Product(aT,deltam7)
 	//fmt.Printf("with all values:\naTpordelta = %v\n\n", atpordelta)
 	//fmt.Printf("with all values:\naTpordelta2 = %v\n\n", atpordeltab)
 	//fmt.Printf("with all values:\naTpordelta3 = %v\n\n", atpordeltac)
 	//fmt.Printf("with all values:\npesos = %v\n\n", c)
 	//fmt.Printf("with all values:\npesos2 = %v\n\n", ac)
 	//fmt.Printf("with all values:\npesos3 = %v\n\n", c3)
-	aux := mat.NewDense(33, 1,nil)
-	aux2:= mat.NewDense(33, 1,nil)
-	aux3:= mat.NewDense(33, 1,nil)
+	aux := mat.NewDense(36, 1,nil)
+	aux2:= mat.NewDense(36, 1,nil)
+	aux3:= mat.NewDense(36, 1,nil)
+	aux4:= mat.NewDense(36, 1,nil)
+	aux5:= mat.NewDense(36, 1,nil)
+	aux6:= mat.NewDense(36, 1,nil)
 	aux.Add(c,atpordelta)	
 	c = aux
 	//fmt.Printf("with all values:\npesos2 = %v\n\n", c)
@@ -296,6 +389,12 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	c3=aux2
 	aux3.Add(c4,atpordeltad)
 	c4=aux3
+	aux4.Add(c5,atpordeltae)
+	c5=aux4
+	aux5.Add(c6,atpordeltaf)
+	c6=aux5
+	aux6.Add(c7,atpordeltag)
+	c7=aux6
 	//c3.Add(c3,atpordeltac)
 	//fmt.Printf("with all values:\npesos2 = %v\n\n", c)
 	//fmt.Printf("with all values:\npesos22 = %v\n\n", ac)
@@ -307,12 +406,15 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	y++
 	}
 	
-	inputprueba := []float64{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} 
+	inputprueba := []float64{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} 
 	//inputpruebamat := mat.NewDense(1, 26,inputprueba)
 	prediction := mat.NewDense(1, 1, nil)
 	prediction2 := mat.NewDense(1, 1, nil)
 	prediction3 := mat.NewDense(1, 1, nil)
 	prediction4 := mat.NewDense(1, 1, nil)
+	prediction5 := mat.NewDense(1, 1, nil)
+	prediction6 := mat.NewDense(1, 1, nil)
+	prediction7 := mat.NewDense(1, 1, nil)
 	//prediction.Product(inputpruebamat, c)
 	//prediction2.Product(inputpruebamat, ac)
 	//prediction3.Product(inputpruebamat, c3)
@@ -329,7 +431,7 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	//fmt.Print("Enter text: ")
 	//text, _ := reader.ReadString('\n')
 	//fmt.Println(text)
-	var transinput[33] float64
+	var transinput[36] float64
 	
 	
 	
@@ -360,15 +462,14 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	
 	
 	fmt.Printf("with all values:\ntransinput = %v\n\n", transinput)
-	inputpruebamat := mat.NewDense(1, 33,inputprueba)
+	inputpruebamat := mat.NewDense(1, 36,inputprueba)
 	prediction.Product(inputpruebamat, c)
 	prediction2.Product(inputpruebamat, ac)
 	prediction3.Product(inputpruebamat, c3)
 	prediction4.Product(inputpruebamat,c4)
-	
-	
-	
-	
+	prediction5.Product(inputpruebamat,c5)
+	prediction6.Product(inputpruebamat,c6)
+	prediction7.Product(inputpruebamat,c7)	
 	
 	
 
@@ -384,6 +485,7 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 		
 	conv = math.Round(actifinal)
 	actifinalround = conv
+	//fmt.Printf("with all values:\n = %v\n\n", z)
 	
 	//var resultML string
 	if actifinalround == 1{
@@ -418,12 +520,42 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 				conv = math.Round(actifinal)
 				actifinalround = conv
 				if actifinalround == 1{
-					jsonAnswer.ResultML = "order"
-					jsonAnswer.Output = "Claro que si, esperamos te guste mucho tu orden"
+					jsonAnswer.ResultML = "orderpizza"
+					jsonAnswer.Output = "Claro que si, esperamos te guste mucho tu orden de pizza"
 					//fmt.Printf(resultML)
-				}else{
-					jsonAnswer.ResultML = "unknown"
-					jsonAnswer.Output = "Podrias explicarme mejor que quisiste decir?, aún estoy aprendiendo"
+				}else if actifinalround == 0{
+					z = prediction5.At(0,0)
+					z=1.0 / (1 + math.Exp(-1*z))
+					actifinal = z
+					conv = math.Round(actifinal)
+					actifinalround = conv
+					if actifinalround == 1{
+						jsonAnswer.ResultML = "orderburguer"
+						jsonAnswer.Output = "Claro que si, esperamos te guste mucho tu orden de hamburguesa"
+					}else if actifinalround == 0 {
+						z = prediction6.At(0,0)
+						z=1.0 / (1 + math.Exp(-1*z))
+						actifinal = z
+						conv = math.Round(actifinal)
+						actifinalround = conv
+						if actifinalround == 1{
+							jsonAnswer.ResultML = "ordersalad"
+							jsonAnswer.Output = "Claro que si, esperamos te guste mucho tu orden de ensalada"
+						}else if actifinalround == 0{
+							z = prediction7.At(0,0)
+							z=1.0 / (1 + math.Exp(-1*z))
+							actifinal = z
+							conv = math.Round(actifinal)
+							actifinalround = conv
+							if actifinalround == 1{
+								jsonAnswer.ResultML = "ordersoda"
+								jsonAnswer.Output = "Claro que si, esperamos te guste mucho tu orden de gaseosa"
+							}else{
+								jsonAnswer.ResultML = "unknown"
+								jsonAnswer.Output = "Lo siento, no entiendo, intenta ser mas claro o especifico"
+							}
+						}
+					}
 				}
 			}
 		}
