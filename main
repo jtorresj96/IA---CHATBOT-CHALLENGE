@@ -1,0 +1,422 @@
+package main
+
+import (
+	"fmt"
+	"net/http"
+	//"time"
+)
+import "math"
+
+import "strings"
+import "gonum.org/v1/gonum/mat"
+//import "github.com/gorilla/mux"
+import "encoding/json"
+import "os"
+import "bufio"
+
+
+
+func removeDuplicateElement(addrs []string) []string {
+    result := make([]string, 0, len(addrs))
+    temp := map[string]struct{}{}
+    for _, item := range addrs {
+        if _, ok := temp[item]; !ok {
+            temp[item] = struct{}{}
+            result = append(result, item)
+        }
+    }
+    return result
+}
+
+type Data struct
+{
+	sentence string
+	class string
+}
+
+type MLresult struct{
+	ResultML string 
+	Output string 
+
+}
+
+type datajson struct
+{
+	Data MLresult
+}
+//type MLresult [] mlr
+
+func MLrestaurant(text string)(jsonAnswer MLresult){
+	var words[] string
+	var training[] Data
+	var aux[] string
+
+	
+	//aux := Data{"how are you?","greeting"}
+	training = append(training,Data{"hola","greeting"})
+	training = append(training,Data{"cómo estás?","greeting"})
+	training = append(training,Data{"buenos días","greeting"})
+	training = append(training,Data{"buenas tardes","greeting"})	
+	training = append(training,Data{"buenas noches","greeting"})
+	
+	training = append(training,Data{"la comida estuvo excelente","liked"})
+	training = append(training,Data{"me encantó la comida","liked"})
+	training = append(training,Data{"la comida estuvo de lujo","liked"})	
+	training = append(training,Data{"que comida tan buena","liked"})
+	training = append(training,Data{"genial la comida","liked"})
+	
+	training = append(training,Data{"no me gustó la comida","disliked"})
+	training = append(training,Data{"la comida estuvo horrible","disliked"})
+	training = append(training,Data{"que comida tan fea","disliked"})
+	training = append(training,Data{"que asco de comida","disliked"})
+	training = append(training,Data{"la comida estuvo espantosa","disliked"})
+	//training = append(training,Data{"la comida estuvo horrible","disliked"})
+	
+	//words := strings.Split(training[0].sentence," ")	
+	//fmt.Println(words[1])
+	
+
+
+	for i:=0 ; i < len(training) ; i++{	
+		training[i].sentence = strings.TrimRight(training[i].sentence, "?")
+		aux =  strings.Split(training[i].sentence," ")
+		for j:=0; j<len(aux);j++{
+			words = append(words,aux[j])
+		}
+	}	
+	//var tamano int	
+	words = removeDuplicateElement(words)
+	//tamano = len(words)
+	//fmt.Println(tamano)
+	var bagtraining[15][26] float64	
+	//fmt.Println(bagtraining)
+
+	for x:=0 ; x < len(training); x++{
+		aux =  strings.Split(training[x].sentence," ")
+		for i:=0 ; i < len(words) ; i++{		
+			for j:=0; j<len(aux);j++{
+				if words[i] == aux[j]{
+					bagtraining[x][i] = 1
+					break
+				}else{
+					bagtraining[x][i] = 0 
+				}
+				//k=k+1
+			}
+		}
+	}
+	
+	//fmt.Println(training[4].sentence)
+	//fmt.Println(words)
+	//fmt.Println(bagtraining)
+	
+	targets := []float64{1,1,1,1,1,0,0,0,0,0,0,0,0,0,0}  // greeting
+	targets2:= []float64{0,0,0,0,0,1,1,1,1,1,0,0,0,0,0}  // liked
+	targets3:= []float64{0,0,0,0,0,0,0,0,0,0,1,1,1,1,1}  // disliked
+	
+	//fmt.Println(targets)
+	var bagtrainingarr [] float64
+	
+		for x:=0 ; x < len(bagtraining); x++{				
+			for j:=0; j<len(bagtraining[x]);j++{
+				bagtrainingarr = append(bagtrainingarr,bagtraining[x][j])			
+			}
+		}
+	
+	//fmt.Println(bagtrainingarr)
+	
+	a := mat.NewDense(15, 26,bagtrainingarr )
+	//fa := mat.Formatted(a, mat.Prefix("    "), mat.Squeeze()) //matriz fa donde estan todos los datos de entrenamiento
+	//fmt.Printf("with all values:\na = %v\n\n", fa)
+	
+	b := mat.NewDense(15, 1,targets )
+	b2:= mat.NewDense(15, 1,targets2 )
+	b3:= mat.NewDense(15, 1,targets3 )
+	//fb := mat.Formatted(b, mat.Prefix("    "), mat.Squeeze()) //matriz fa donde estan todos los target del entrenamiento
+	//fmt.Printf("with all values:\nb = %v\n\n", fb)
+	
+	weight :=[]float64{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5}
+	c := mat.NewDense(26, 1,weight )
+	ac:= mat.NewDense(26, 1,weight )
+	c3:= mat.NewDense(26, 1,weight )
+	//fc := mat.Formatted(c, mat.Prefix("    "), mat.Squeeze()) //matriz de pesos
+	//fmt.Printf("with all values:\nc = %v\n\n", fc)
+	var y int
+	y=0
+	for y<50000{
+	r, _ := a.Dims()
+	_, l := c.Dims()
+	_, l2 := ac.Dims()
+	_, l3 := c3.Dims()
+	o := mat.NewDense(r, l, nil)
+	o2:= mat.NewDense(r, l2, nil)
+	o3:= mat.NewDense(r, l3, nil)
+	o.Product(a, c)
+	o2.Product(a, ac)
+	o3.Product(a, c3)
+	//fo := mat.Formatted(o, mat.Prefix("    "), mat.Squeeze()) //matriz de pesos	
+	//fmt.Printf("with all values:\no = %v\n\n", o)  // matriz resultante de multiplicar el training data por los pesos se lleamara (tporp)
+	
+	var actiportporp [] float64 // matriz de activacion por tporp
+	var actiportporp2 [] float64
+	var actiportporp3 [] float64
+	var z float64	
+	var z2 float64
+	var z3 float64
+	for x:=0 ; x < r; x++{	
+		z = o.At(x,0)
+		z2= o2.At(x,0)
+		z3= o3.At(x,0)
+		z=1.0 / (1 + math.Exp(-1*z))
+		z2=1.0 / (1 + math.Exp(-1*z2))
+		z3=1.0 / (1 + math.Exp(-1*z3))
+		actiportporp = append(actiportporp,z)
+		actiportporp2 = append(actiportporp2,z2)
+		actiportporp3 = append(actiportporp3,z3)
+		//fmt.Printf("with all values:\nz = %v\n\n", z)
+	}
+
+	//fmt.Printf("with all values:\nactiportporp = %v\n\n",actiportporp )
+	app:=mat.NewDense(15,1,actiportporp)
+	app2:=mat.NewDense(15,1,actiportporp2)
+	app3:=mat.NewDense(15,1,actiportporp3)
+	error := mat.NewDense(15, 1, nil)
+	error2 := mat.NewDense(15, 1, nil)
+	error3 := mat.NewDense(15, 1, nil)
+	error.Sub(b,app)
+	error2.Sub(b2,app2)
+	error3.Sub(b3,app3)
+	//fmt.Printf("with all values:\nerror = %v\n\n",error )
+	//fmt.Printf("with all values:\nerror2 = %v\n\n",error2 )
+	//fmt.Printf("with all values:\nerror3 = %v\n\n",error3 )
+	var derivative [] float64
+	var derivative2 [] float64
+	var derivative3 [] float64
+	for x:=0 ; x < 15; x++{	
+		z = app.At(x,0)
+		z = z * (1 - z)
+		derivative = append(derivative,z)
+		z2 = app2.At(x,0)
+		z2 = z2 * (1 - z2)
+		derivative2 = append(derivative2,z2)
+		z3 = app3.At(x,0)
+		z3 = z3 * (1 - z3)		
+		derivative3 = append(derivative3,z3)
+		//fmt.Printf("with all values:\nz = %v\n\n", z)
+	}
+	
+	//fmt.Printf("with all values:\nderivative = %v\n\n",derivative )
+	derivativemat:= mat.NewDense(15,1,derivative)
+	derivativemat2:= mat.NewDense(15,1,derivative2)
+	derivativemat3:= mat.NewDense(15,1,derivative3)
+	
+	var delta [] float64
+	var delta2 [] float64
+	var delta3 [] float64
+	for x:=0 ; x < 15; x++{	
+		z = derivativemat.At(x,0)* error.At(x,0)
+		delta = append(delta,z)
+		z2 = derivativemat2.At(x,0)* error2.At(x,0)
+		delta2 = append(delta2,z2)
+		z3 = derivativemat3.At(x,0)* error3.At(x,0)
+		delta3 = append(delta3,z3)
+		//fmt.Printf("with all values:\nz = %v\n\n", z)
+	}
+	//fmt.Printf("with all values:\ndelta = %v\n\n",delta )
+	//fmt.Printf("with all values:\ndelta2 = %v\n\n",delta2 )
+	//fmt.Printf("with all values:\ndelta3 = %v\n\n",delta3 )
+	
+	deltam:= mat.NewDense(15,1,delta)
+	deltam2:= mat.NewDense(15,1,delta2)
+	deltam3:= mat.NewDense(15,1,delta3)
+	//fmt.Printf("with all values:\ndelta = %v\n\n", deltam)
+	//fmt.Printf("with all values:\ndelta2 = %v\n\n", deltam2)
+	//fmt.Printf("with all values:\ndelta3 = %v\n\n", deltam3)
+	//fmt.Printf("with all values:\na = %v\n\n", fa)
+	aT:=a.T()
+	//fmt.Printf("with all values:\naT = %v\n\n", aT)
+
+	s, _ := aT.Dims()
+	_, k := deltam.Dims()
+	_, k2 := deltam2.Dims()
+	_, k3 := deltam3.Dims()
+	atpordelta := mat.NewDense(s, k, nil)
+	atpordeltab := mat.NewDense(s, k2, nil)
+	atpordeltac := mat.NewDense(s, k3, nil)
+	atpordelta.Product(aT, deltam)
+	atpordeltab.Product(aT, deltam2)
+	atpordeltac.Product(aT, deltam3)
+	//fmt.Printf("with all values:\naTpordelta = %v\n\n", atpordelta)
+	//fmt.Printf("with all values:\naTpordelta2 = %v\n\n", atpordeltab)
+	//fmt.Printf("with all values:\naTpordelta3 = %v\n\n", atpordeltac)
+	//fmt.Printf("with all values:\npesos = %v\n\n", c)
+	//fmt.Printf("with all values:\npesos2 = %v\n\n", ac)
+	//fmt.Printf("with all values:\npesos3 = %v\n\n", c3)
+	aux := mat.NewDense(26, 1,nil)
+	aux2:= mat.NewDense(26, 1,nil)
+	aux.Add(c,atpordelta)	
+	c = aux
+	//fmt.Printf("with all values:\npesos2 = %v\n\n", c)
+	ac.Add(ac,atpordeltab)
+	aux2.Add(c3,atpordeltac)
+	c3=aux2
+	//c3.Add(c3,atpordeltac)
+	//fmt.Printf("with all values:\npesos2 = %v\n\n", c)
+	//fmt.Printf("with all values:\npesos22 = %v\n\n", ac)
+	//fmt.Printf("with all values:\npesos33 = %v\n\n", c3)
+	//fmt.Printf("with all values:\nerror = %v\n\n", error)
+	//fmt.Printf("with all values:\nerror2 = %v\n\n", error2)
+	//fmt.Printf("with all values:\nerror3 = %v\n\n", error3)
+	
+	y++
+	}
+	
+	inputprueba := []float64{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} 
+	//inputpruebamat := mat.NewDense(1, 26,inputprueba)
+	prediction := mat.NewDense(1, 1, nil)
+	prediction2 := mat.NewDense(1, 1, nil)
+	prediction3 := mat.NewDense(1, 1, nil)
+	//prediction.Product(inputpruebamat, c)
+	//prediction2.Product(inputpruebamat, ac)
+	//prediction3.Product(inputpruebamat, c3)
+	//fmt.Printf("with all values:\npesos = %v\n\n", c)
+	//fmt.Printf("with all values:\npesos2 = %v\n\n", ac)
+	//fmt.Printf("with all values:\npesos3 = %v\n\n", c3)
+	//fmt.Printf("with all values:\ninputprueba = %v\n\n", inputpruebamat)
+	//fmt.Printf("with all values:\nprediccion = %v\n\n", prediction)
+	//fmt.Printf("with all values:\nprediccion2 = %v\n\n", prediction2)
+	//fmt.Printf("with all values:\nprediccion3 = %v\n\n", prediction3)
+	//fmt.Printf("with all values:\nerror = %v\n\n", error)
+	//fmt.Printf("with all values:\nwords = %v\n\n", words)
+	//reader := bufio.NewReader(os.Stdin)
+	//fmt.Print("Enter text: ")
+	//text, _ := reader.ReadString('\n')
+	//text:="hola"
+	//fmt.Println(text)
+	var transinput[26] float64
+	
+	
+	
+	aux =  strings.Split(text," ")
+	//aux =  strings.Split(text,"\n")
+	
+	//fmt.Printf("with all values:\nlenaux = %v\n\n", len(aux[0]))
+		for i:=0 ; i < len(words) ; i++{		
+			for j:=0; j<len(aux);j++{
+				//fmt.Println(aux[j])
+				//fmt.Println(words[i])
+				if strings.Contains(aux[j],words[i]){
+					//fmt.Println("entre")
+					transinput[i]=1 
+					
+					break
+				}else{
+					transinput[i]=0
+				}
+				//k=k+1
+			}
+		
+		}
+	
+	for i:=0 ; i < len(transinput) ; i++{
+		inputprueba[i]=transinput[i]
+	}
+	
+	
+	//fmt.Printf("with all values:\ntransinput = %v\n\n", transinput)
+	inputpruebamat := mat.NewDense(1, 26,inputprueba)
+	prediction.Product(inputpruebamat, c)
+	prediction2.Product(inputpruebamat, ac)
+	prediction3.Product(inputpruebamat, c3)
+	
+	
+	
+	
+	
+	
+	
+
+	var actifinal float64
+	var z float64
+	
+	z = prediction.At(0,0)
+	z=1.0 / (1 + math.Exp(-1*z))
+	actifinal = z
+	//fmt.Printf("with all values:\n = %v\n\n", z)	
+	var actifinalround float64
+	var conv float64
+		
+	conv = math.Round(actifinal)
+	actifinalround = conv
+	//fmt.Printf("with all values:\n = %v\n\n", z)
+	
+	//var resultML string
+	if actifinalround == 1{
+		jsonAnswer.ResultML = "greeting"
+		jsonAnswer.Output = "hola, encantados de atenderte"
+		//fmt.Printf(resultML)
+	}else if actifinalround == 0{
+		z = prediction2.At(0,0)
+		z=1.0 / (1 + math.Exp(-1*z))
+		actifinal = z
+		conv = math.Round(actifinal)
+		actifinalround = conv
+		if actifinalround ==1 {
+			jsonAnswer.ResultML = "liked"
+			jsonAnswer.Output = "Nos emociona escuchar eso, seguiremos manteniendo nuestros estandares"
+			//fmt.Printf(resultML)
+		}else if actifinalround == 0{
+			z = prediction3.At(0,0)
+			z=1.0 / (1 + math.Exp(-1*z))
+			actifinal = z
+			conv = math.Round(actifinal)
+			actifinalround = conv
+			if actifinalround == 1{
+				jsonAnswer.ResultML = "disliked"
+				jsonAnswer.Output = "Lo sentimos, estamos trabajando por mejorar"
+				//fmt.Printf(resultML)
+				
+			}
+		}
+		
+	}
+	return
+
+}
+
+
+func requestHandler(w http.ResponseWriter, r *http.Request) {
+	resultreturn := MLrestaurant(r.URL.Path[1:])
+	//resultreturn := r.URL.Path[1:]
+	resultreturnjson := MLresult{ResultML:resultreturn.ResultML, Output:resultreturn.Output}
+	resultreturndata := datajson{Data:resultreturn}
+
+	
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resultreturndata)
+	//fmt.Fprintf(w,string(e))
+	fmt.Println("URL: ", r.URL.Path[1:] )
+	fmt.Println("el resultado es: ", resultreturnjson )
+	
+}
+
+func requestHandlerpost(w http.ResponseWriter, r *http.Request) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter text: ")
+	texta, _ = reader.ReadString('\n')	
+	fmt.Fprintf(w, texta)
+
+}
+
+var texta string
+func main() {
+	fmt.Println("Starting server on port :8082")
+	//myrouter := mux.NewRouter().StrictSlash(true)
+	//myrouter.HandleFunc("/clasification", requestHandlerpost).Methods("POST")
+	//myrouter.HandleFunc("/", requestHandler).Methods("GET")	
+	http.HandleFunc("/", requestHandler)
+	err := http.ListenAndServe(":8082", nil)
+	if err != nil {
+		fmt.Println("ListenAndServe:", err)
+	}
+}
