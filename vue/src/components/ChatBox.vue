@@ -46,8 +46,6 @@ export default {
       //
       //this.message = ''   
     this.$axios.get(`http://127.0.0.1:8082/${message}`)   
-    //this.axios.get(`https://jsonplaceholder.typicode.com/todos/1` )
-    //this.$axios.get(`https://www.cleverbot.com/getreply?key=CC8uqcCcSO3VsRFvp5-uW5Nxvow&input=${message}`)
       //.then(response => data = response.data)
       //data = Promise.resolve(123)        
       .then(res => {
