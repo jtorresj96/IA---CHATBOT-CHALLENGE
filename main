@@ -81,7 +81,7 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	
 	training = append(training,Data{"quiero ordenar ensalada","ordersalad"})
 	training = append(training,Data{"por favor quiero una ensalada","ordersalad"})
-	training = append(training,Data{"ensalada por favor ","ordersalad"})
+	training = append(training,Data{"ensalada por favor","ordersalad"})
 	
 	training = append(training,Data{"quiero ordenar gaseosa","ordersoda"})
 	training = append(training,Data{"por favor quiero una gaseosa","ordersoda"})
@@ -104,7 +104,7 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	words = removeDuplicateElement(words)
 	tamano = len(words)
 	fmt.Println(tamano)
-	var bagtraining[27][36] float64	
+	var bagtraining[27][35] float64	
 	//fmt.Println(bagtraining)
 	
 	for x:=0 ; x < len(training); x++{
@@ -144,7 +144,7 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	
 	//fmt.Println(bagtrainingarr)
 	
-	a := mat.NewDense(27, 36,bagtrainingarr )
+	a := mat.NewDense(27, 35,bagtrainingarr )
 	//fa := mat.Formatted(a, mat.Prefix("    "), mat.Squeeze()) //matriz fa donde estan todos los datos de entrenamiento
 	//fmt.Printf("with all values:\na = %v\n\n", fa)
 	
@@ -159,14 +159,14 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	//fb := mat.Formatted(b, mat.Prefix("    "), mat.Squeeze()) //matriz fa donde estan todos los target del entrenamiento
 	//fmt.Printf("with all values:\nb = %v\n\n", fb)
 	//fmt.Println("llegue aca")
-	weight :=[]float64{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5}
-	c := mat.NewDense(36, 1,weight )
-	ac:= mat.NewDense(36, 1,weight )
-	c3:= mat.NewDense(36, 1,weight )
-	c4:= mat.NewDense(36, 1,weight )
-	c5:= mat.NewDense(36, 1,weight )
-	c6:= mat.NewDense(36, 1,weight )
-	c7:= mat.NewDense(36, 1,weight )
+	weight :=[]float64{0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5}
+	c := mat.NewDense(35, 1,weight )
+	ac:= mat.NewDense(35, 1,weight )
+	c3:= mat.NewDense(35, 1,weight )
+	c4:= mat.NewDense(35, 1,weight )
+	c5:= mat.NewDense(35, 1,weight )
+	c6:= mat.NewDense(35, 1,weight )
+	c7:= mat.NewDense(35, 1,weight )
 	
 	//fc := mat.Formatted(c, mat.Prefix("    "), mat.Squeeze()) //matriz de pesos
 	//fmt.Printf("with all values:\nc = %v\n\n", fc)
@@ -375,12 +375,12 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	//fmt.Printf("with all values:\npesos = %v\n\n", c)
 	//fmt.Printf("with all values:\npesos2 = %v\n\n", ac)
 	//fmt.Printf("with all values:\npesos3 = %v\n\n", c3)
-	aux := mat.NewDense(36, 1,nil)
-	aux2:= mat.NewDense(36, 1,nil)
-	aux3:= mat.NewDense(36, 1,nil)
-	aux4:= mat.NewDense(36, 1,nil)
-	aux5:= mat.NewDense(36, 1,nil)
-	aux6:= mat.NewDense(36, 1,nil)
+	aux := mat.NewDense(35, 1,nil)
+	aux2:= mat.NewDense(35, 1,nil)
+	aux3:= mat.NewDense(35, 1,nil)
+	aux4:= mat.NewDense(35, 1,nil)
+	aux5:= mat.NewDense(35, 1,nil)
+	aux6:= mat.NewDense(35, 1,nil)
 	aux.Add(c,atpordelta)	
 	c = aux
 	//fmt.Printf("with all values:\npesos2 = %v\n\n", c)
@@ -406,7 +406,7 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	y++
 	}
 	
-	inputprueba := []float64{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} 
+	inputprueba := []float64{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} 
 	//inputpruebamat := mat.NewDense(1, 26,inputprueba)
 	prediction := mat.NewDense(1, 1, nil)
 	prediction2 := mat.NewDense(1, 1, nil)
@@ -431,7 +431,7 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	//fmt.Print("Enter text: ")
 	//text, _ := reader.ReadString('\n')
 	//fmt.Println(text)
-	var transinput[36] float64
+	var transinput[35] float64
 	
 	
 	
@@ -462,7 +462,7 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	
 	
 	fmt.Printf("with all values:\ntransinput = %v\n\n", transinput)
-	inputpruebamat := mat.NewDense(1, 36,inputprueba)
+	inputpruebamat := mat.NewDense(1, 35,inputprueba)
 	prediction.Product(inputpruebamat, c)
 	prediction2.Product(inputpruebamat, ac)
 	prediction3.Product(inputpruebamat, c3)
