@@ -11,9 +11,8 @@ import "strings"
 import "gonum.org/v1/gonum/mat"
 //import "github.com/gorilla/mux"
 import "encoding/json"
-import "os"
-import "bufio"
-
+//import "os"
+//import "bufio"
 
 
 func removeDuplicateElement(addrs []string) []string {
@@ -95,18 +94,21 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 
 	for i:=0 ; i < len(training) ; i++{	
 		training[i].sentence = strings.TrimRight(training[i].sentence, "?")
-		aux =  strings.Split(training[i].sentence," ")
+		aux =  strings.Split(training[i].sentence," ") // crea un vector que esta dividido por espacios
 		for j:=0; j<len(aux);j++{
-			words = append(words,aux[j])
+			words = append(words,aux[j])  //agrega una palabra a la posición indicada
 		}
 	}	
 	var tamano int	
-	words = removeDuplicateElement(words)
+	words = removeDuplicateElement(words)   // quita las palabras duplicadas
 	tamano = len(words)
 	fmt.Println(tamano)
 	var bagtraining[27][35] float64	
 	//fmt.Println(bagtraining)
 	
+	
+	// este segmento de codigo recibe las frases del data training y las convierte en 1/0 si encuentra la palabra en el arreglo words
+	// busca la palabra en la frase si la encuentra pone 1 si no pone 0 y crea una matriz de tamaño [numero de frases][numero de palabras]
 	for x:=0 ; x < len(training); x++{
 		aux =  strings.Split(training[x].sentence," ")
 		for i:=0 ; i < len(words) ; i++{		
@@ -136,6 +138,7 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	//fmt.Println(targets)
 	var bagtrainingarr [] float64
 	
+	// crea un arreglo tomando los datos de la matriz de entrenamiento (se hace para poder crear la matriz tipo mat)
 		for x:=0 ; x < len(bagtraining); x++{				
 			for j:=0; j<len(bagtraining[x]);j++{
 				bagtrainingarr = append(bagtrainingarr,bagtraining[x][j])			
@@ -173,8 +176,8 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	var y int
 	y=0
 	for y<50000{
-	r, _ := a.Dims()
-	_, l := c.Dims()
+	r, _ := a.Dims()  // arreglo de frases
+  	_, l := c.Dims()  // areglo de pesos
 	_, l2 := ac.Dims()
 	_, l3 := c3.Dims()
 	_, l4 := c4.Dims()
@@ -213,7 +216,7 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	var z6 float64
 	var z7 float64
 	for x:=0 ; x < r; x++{	
-		z = o.At(x,0)
+		z = o.At(x,0)  // At retorna el valor que se encuentre en los parametros enviados
 		z2= o2.At(x,0)
 		z3= o3.At(x,0)
 		z4= o4.At(x,0)
@@ -490,7 +493,7 @@ func MLrestaurant(text string)(jsonAnswer MLresult){
 	//var resultML string
 	if actifinalround == 1{
 		jsonAnswer.ResultML = "greeting"
-		jsonAnswer.Output = "hola, encantados de atenderte"
+		jsonAnswer.Output = "hola, encantados de atenderte"		
 		//fmt.Printf(resultML)
 	}else if actifinalround == 0{
 		z = prediction2.At(0,0)
@@ -581,15 +584,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	
 }
 
-func requestHandlerpost(w http.ResponseWriter, r *http.Request) {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter text: ")
-	texta, _ = reader.ReadString('\n')	
-	fmt.Fprintf(w, texta)
 
-}
-
-var texta string
 func main() {
 	fmt.Println("Starting server on port :8082")
 	//myrouter := mux.NewRouter().StrictSlash(true)
